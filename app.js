@@ -1,10 +1,3 @@
-/* ═══════════════════════════════════════════════════════════
-   SHOPX — app.js
-   All application logic: state, routing, API, rendering
-═══════════════════════════════════════════════════════════ */
-
-// ── STATE ──────────────────────────────────────────────────────────────────────
-
 let allProducts = [];
 let filteredProducts = [];
 let currentCategory = 'all';
@@ -13,7 +6,7 @@ let currentProduct = null;
 let cart = JSON.parse(localStorage.getItem('shopx-cart') || '[]');
 let toastTimer = null;
 
-// ── ROUTING ────────────────────────────────────────────────────────────────────
+
 
 function navigate(page, productId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -24,7 +17,7 @@ function navigate(page, productId) {
   if (page === 'cart') renderCart();
 }
 
-// ── INIT / FETCH ALL PRODUCTS ──────────────────────────────────────────────────
+
 
 async function init() {
   try {
@@ -42,7 +35,7 @@ async function init() {
   }
 }
 
-// ── CATEGORIES ─────────────────────────────────────────────────────────────────
+
 
 function renderCategories() {
   const categories = ['all', ...new Set(allProducts.map(p => p.category))];
@@ -71,7 +64,7 @@ function selectCategory(cat) {
   applyFilters();
 }
 
-// ── SEARCH ─────────────────────────────────────────────────────────────────────
+
 
 function handleNavSearch(value) {
   searchQuery = value.toLowerCase();
@@ -87,7 +80,7 @@ function handleMobSearch(value) {
   applyFilters();
 }
 
-// ── FILTERS + SORT ─────────────────────────────────────────────────────────────
+
 
 function applyFilters() {
   let results = allProducts.filter(product => {
@@ -129,7 +122,7 @@ function resetFilters() {
   renderProducts(filteredProducts);
 }
 
-// ── RENDER: PRODUCT GRID ───────────────────────────────────────────────────────
+
 
 function renderProducts(products) {
   const grid = document.getElementById('product-grid');
@@ -200,7 +193,7 @@ function renderProducts(products) {
   }).join('');
 }
 
-// ── RENDER: STAR RATINGS ───────────────────────────────────────────────────────
+
 
 function buildStarsHTML(rating, size = 'normal') {
   const sizeClass = size === 'small' ? 'w-3 h-3' : 'w-4 h-4';
@@ -218,7 +211,7 @@ function buildStarsHTML(rating, size = 'normal') {
   }).join('');
 }
 
-// ── FETCH + RENDER: PRODUCT DETAIL ────────────────────────────────────────────
+
 
 async function loadDetail(id) {
   const skeleton = document.getElementById('detail-skeleton');
@@ -248,28 +241,34 @@ function renderDetail(product) {
 
   const discountedPrice = (product.price * (1 - product.discountPercentage / 100)).toFixed(2);
 
-  // Main image
+  
+
   document.getElementById('detail-main-img').src = product.images[0] || product.thumbnail;
   document.getElementById('detail-main-img').alt = product.title;
 
-  // Badges
+  
+
   document.getElementById('detail-category').textContent = formatCategory(product.category);
   document.getElementById('detail-brand').textContent = product.brand || 'Brand';
 
-  // Title
+  
+
   document.getElementById('detail-title').textContent = product.title;
 
-  // Rating
+  
+
   document.getElementById('detail-stars').innerHTML = buildStarsHTML(product.rating);
   document.getElementById('detail-rating-text').textContent =
     `${product.rating.toFixed(1)} · ${product.reviews?.length || 0} reviews`;
 
-  // Price
+  
+
   document.getElementById('detail-price').textContent = `$${discountedPrice}`;
   document.getElementById('detail-original').textContent = `$${product.price.toFixed(2)}`;
   document.getElementById('detail-discount').textContent = `${Math.round(product.discountPercentage)}% off`;
 
-  // Stock
+  
+
   const inStock = product.stock > 0;
   const stockDot = document.getElementById('detail-stock-dot');
   const stockText = document.getElementById('detail-stock-text');
@@ -278,16 +277,19 @@ function renderDetail(product) {
   stockText.textContent = inStock ? `In stock (${product.stock} left)` : 'Out of stock';
   stockText.className = `text-sm ${inStock ? 'text-green-600' : 'text-red-500'}`;
 
-  // Description
+  
+
   document.getElementById('detail-desc').textContent = product.description;
 
-  // Tags
+  
+
   const tagsWrap = document.getElementById('detail-tags-wrap');
   tagsWrap.innerHTML = (product.tags || []).map(tag =>
     `<span class="badge bg-gray-100 text-gray-500 px-2.5 py-1 rounded-full">#${tag}</span>`
   ).join('');
 
-  // Image Thumbnails
+  
+
   const thumbsWrap = document.getElementById('detail-thumbs');
   const images = [product.thumbnail, ...(product.images || [])].filter(Boolean).slice(0, 6);
 
@@ -302,7 +304,8 @@ function renderDetail(product) {
     </button>
   `).join('');
 
-  // Cart button state
+  
+
   const isInCart = cart.some(c => c.id === product.id);
   const cartBtn = document.getElementById('detail-cart-btn');
 
@@ -349,7 +352,7 @@ function addToCartFromDetail() {
     Added to Cart`;
 }
 
-// ── CART: ADD ──────────────────────────────────────────────────────────────────
+
 
 function addToCart(id, productData) {
   const product = productData || allProducts.find(p => p.id === id);
@@ -374,7 +377,8 @@ function addToCart(id, productData) {
   updateCartCount();
   showToast(`${product.title.slice(0, 28)}... added to cart!`);
 
-  // Update the card button in the listing grid
+  
+
   const listingBtn = document.getElementById(`btn-${id}`);
   if (listingBtn) {
     listingBtn.textContent = '✓ In Cart';
@@ -382,7 +386,7 @@ function addToCart(id, productData) {
   }
 }
 
-// ── CART: SAVE + COUNT ─────────────────────────────────────────────────────────
+
 
 function saveCart() {
   localStorage.setItem('shopx-cart', JSON.stringify(cart));
@@ -400,7 +404,7 @@ function updateCartCount() {
   }
 }
 
-// ── CART: QUANTITY CONTROLS ────────────────────────────────────────────────────
+
 
 function changeQty(id, delta) {
   const item = cart.find(c => c.id === id);
@@ -411,7 +415,8 @@ function changeQty(id, delta) {
   if (item.qty <= 0) {
     cart = cart.filter(c => c.id !== id);
 
-    // Reset the listing button if visible
+    
+
     const listingBtn = document.getElementById(`btn-${id}`);
     if (listingBtn) {
       listingBtn.textContent = 'Add to Cart';
@@ -427,7 +432,8 @@ function changeQty(id, delta) {
 function removeItem(id) {
   cart = cart.filter(c => c.id !== id);
 
-  // Reset listing button if visible
+  
+
   const listingBtn = document.getElementById(`btn-${id}`);
   if (listingBtn) {
     listingBtn.textContent = 'Add to Cart';
@@ -439,7 +445,7 @@ function removeItem(id) {
   renderCart();
 }
 
-// ── CART: RENDER ───────────────────────────────────────────────────────────────
+
 
 function renderCart() {
   const emptyState = document.getElementById('cart-empty');
@@ -460,7 +466,8 @@ function renderCart() {
   cartContent.classList.remove('hidden');
   cartContent.style.display = 'grid';
 
-  // Render each cart item
+  
+
   itemsList.innerHTML = cart.map(item => {
     const discountedPrice = item.price * (1 - item.discountPercentage / 100);
     const lineTotal = (discountedPrice * item.qty).toFixed(2);
@@ -518,7 +525,8 @@ function renderCart() {
       </div>`;
   }).join('');
 
-  // Bill calculations
+  
+
   const subtotal     = cart.reduce((s, c) => s + c.price * c.qty, 0);
   const discountAmt  = cart.reduce((s, c) => s + (c.price * c.discountPercentage / 100) * c.qty, 0);
   const delivery     = subtotal > 50 ? 0 : 4.99;
@@ -532,7 +540,7 @@ function renderCart() {
   document.getElementById('savings-amount').textContent = `$${discountAmt.toFixed(2)}`;
 }
 
-// ── TOAST ──────────────────────────────────────────────────────────────────────
+
 
 function showToast(message) {
   const toast = document.getElementById('toast');
@@ -543,7 +551,7 @@ function showToast(message) {
   toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
 }
 
-// ── CHECKOUT ───────────────────────────────────────────────────────────────────
+
 
 function checkout() {
   cart = [];
@@ -553,7 +561,7 @@ function checkout() {
   setTimeout(() => renderCart(), 300);
 }
 
-// ── BOOT ───────────────────────────────────────────────────────────────────────
+
 
 updateCartCount();
 init();
